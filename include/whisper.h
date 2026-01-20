@@ -189,6 +189,18 @@ extern "C" {
         uint32_t             value; // Unicode code point or rule ID
     } whisper_grammar_element;
 
+// TUBI
+    // start/end unitls for whisper_vad_segments_get_segment_t0/t1
+    enum whisper_vad_time_units {
+        
+        // Units are in centiseconds (1/100 of a second, this is the default)
+        WHISPER_VAD_TIME_UNITS_CS,
+
+        // Units are in pcm samples
+        WHISPER_VAD_UNITS_SAMPLES
+    };
+// END TUBI
+
     typedef struct whisper_vad_params {
         float threshold;               // Probability threshold to consider as speech.
         int   min_speech_duration_ms;  // Min duration for a valid speech segment.
@@ -196,6 +208,10 @@ extern "C" {
         float max_speech_duration_s;   // Max duration of a speech segment before forcing a new segment.
         int   speech_pad_ms;           // Padding added before and after speech segments.
         float samples_overlap;         // Overlap in seconds when copying audio samples from speech segment.
+
+// TUBI
+        enum whisper_vad_time_units time_units; // Time units for segment start/end times.
+// END TUBI        
     } whisper_vad_params;
 
     WHISPER_API const char * whisper_version(void);
