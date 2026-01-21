@@ -5087,6 +5087,17 @@ struct whisper_vad_context * whisper_vad_init_with_params(
     return vctx;
 }
 
+// TUBI
+int whisper_vad_window_size(struct whisper_vad_context * vctx) {
+    if (vctx) {
+        return vctx->n_window;
+    } else {
+        WHISPER_LOG_ERROR("%s: invalid VAD context\n", __func__);
+        return -1;
+    }
+}
+// END TUBI
+
 bool whisper_vad_detect_speech(
         struct whisper_vad_context * vctx,
         const float * samples,
