@@ -4443,6 +4443,10 @@ struct whisper_vad_params whisper_vad_default_params(void) {
         /* max_speech_duration_s   = */ FLT_MAX,
         /* speech_pad_ms           = */ 30,
         /* samples_overlap         = */ 0.1,
+
+// TUBI
+        /*time_units               = */ WHISPER_VAD_TIME_UNITS_CS,
+// END TUBI        
     };
     return result;
 }
@@ -5083,6 +5087,17 @@ struct whisper_vad_context * whisper_vad_init_with_params(
     return vctx;
 }
 
+// TUBI
+int whisper_vad_window_size(struct whisper_vad_context * vctx) {
+    if (vctx) {
+        return vctx->n_window;
+    } else {
+        WHISPER_LOG_ERROR("%s: invalid VAD context\n", __func__);
+        return -1;
+    }
+}
+// END TUBI
+
 bool whisper_vad_detect_speech(
         struct whisper_vad_context * vctx,
         const float * samples,
@@ -5402,9 +5417,17 @@ struct whisper_vad_segments * whisper_vad_segments_from_probs(
                 (speeches[i].end + speech_pad_samples) : audio_length_samples;
         }
 
-        // Convert from samples to centiseconds
-        segments[i].start = samples_to_cs(speeches[i].start);
-        segments[i].end   = samples_to_cs(speeches[i].end);
+// TUBI
+        if (params.time_units == WHISPER_VAD_UNITS_SAMPLES) {
+            // Keep in samples
+            segments[i].start = speeches[i].start;
+            segments[i].end   = speeches[i].end;
+        } else {
+            // Convert from samples to centiseconds
+            segments[i].start = samples_to_cs(speeches[i].start);
+            segments[i].end   = samples_to_cs(speeches[i].end);
+        }
+// END TUBI
 
         WHISPER_LOG_INFO("%s: VAD segment %d: start = %.2f, end = %.2f (duration: %.2f)\n",
                         __func__, i, segments[i].start/100.0, segments[i].end/100.0, (segments[i].end - segments[i].start)/100.0);
